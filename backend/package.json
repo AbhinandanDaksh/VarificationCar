@@ -1,0 +1,37 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "VarificationCar backend",
+  "main": "api-gateway/server.js",
+  "scripts": {
+    "auth": "node services/auth/server.js",
+    "vehicles": "node services/vehicles/server.js",
+    "inspections": "node services/inspections/server.js",
+    "payments": "node services/payments/server.js",
+    "notifications": "node services/notifications/server.js",
+    "gateway": "node api-gateway/server.js",
+    "dev:auth": "nodemon services/auth/server.js",
+    "dev:vehicles": "nodemon services/vehicles/server.js",
+    "dev:inspections": "nodemon services/inspections/server.js",
+    "dev:payments": "nodemon services/payments/server.js",
+    "dev:notifications": "nodemon services/notifications/server.js",
+    "dev:gateway": "nodemon api-gateway/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^4.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.22.5",
+    "nodemailer": "^9.0.3",
+    "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
