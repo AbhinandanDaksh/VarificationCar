@@ -11,6 +11,7 @@ app.use('/api/auth', createProxyMiddleware({
   changeOrigin: true,
 }));
 
+
 app.use('/api/vehicles', createProxyMiddleware({
   target: `http://localhost:${process.env.VEHICLE_PORT || 5002}`,
   changeOrigin: true,
