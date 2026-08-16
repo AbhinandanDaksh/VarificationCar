@@ -1,11 +1,8 @@
-import React from 'react'
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './slices/authslice';
 
-const AuthContext = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
-
-export default AuthContext
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+  },
+});
