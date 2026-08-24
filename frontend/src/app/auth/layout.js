@@ -10,7 +10,8 @@ export default function AuthLayout({ children }) {
       {/* Reusable Navbar */}
       <Navbar />
 
-      {/* Main Container */}
+
+      {/*  Main Container */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 md:py-16 flex items-center justify-center">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 w-full items-start">
           
