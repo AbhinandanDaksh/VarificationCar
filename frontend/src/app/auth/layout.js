@@ -6,13 +6,13 @@ import { FiShield } from 'react-icons/fi';
 
 export default function AuthLayout({ children }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col bg-[#FAF6F5]">
       {/* Reusable Navbar */}
       <Navbar />
 
 
       {/*  Main Container */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 md:py-16 flex items-center justify-center">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8 sm:py-12 flex items-start justify-center">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 w-full items-start">
           
           {/* Left Column: Children Form */}
@@ -21,19 +21,19 @@ export default function AuthLayout({ children }) {
           </div>
 
           {/* Right Column: Showcase Sidebar */}
-          <div className="lg:col-span-5 flex flex-col gap-6 max-w-[480px] mx-auto lg:mx-0 w-full">
+          <div className="lg:col-span-5 flex flex-col gap-6 max-w-[480px] mx-auto lg:mx-0 w-full lg:sticky lg:top-24">
             
             {/* Card 1: Enterprise Security */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="bg-white/95 backdrop-blur-md p-6 rounded-2xl border border-[#EDE0DA] shadow-sm transition-all duration-300 hover:shadow-md">
               <div className="flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-                  <FiShield className="w-5.5 h-5.5 text-indigo-600" />
+                <div className="w-10 h-10 rounded-lg bg-[#FAF0ED] border border-[#F3DDD5] flex items-center justify-center shrink-0">
+                  <FiShield className="w-5.5 h-5.5 text-[#965A48]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-[#2E1F1A]">
                     Enterprise Security
                   </h3>
-                  <p className="mt-1 text-sm text-slate-500 font-medium leading-relaxed">
+                  <p className="mt-1 text-sm text-[#7C6660] font-medium leading-relaxed">
                     Bank-grade encryption and automated vehicle history verification protocols for every account.
                   </p>
                 </div>
@@ -41,7 +41,7 @@ export default function AuthLayout({ children }) {
             </div>
 
             {/* Card 2: Join 5,000+ Dealerships */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+            <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-[#EDE0DA] shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
               <div className="relative aspect-[16/9] w-full bg-slate-100">
                 <Image
                   src="/vehicle_verification_showcase.jpg"
@@ -53,10 +53,10 @@ export default function AuthLayout({ children }) {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-[#2E1F1A]">
                   Join 5,000+ Dealerships
                 </h3>
-                <p className="mt-1 text-sm text-slate-500 font-medium leading-relaxed">
+                <p className="mt-1 text-sm text-[#7C6660] font-medium leading-relaxed">
                   The industry standard for rapid vehicle identity and state-of-repair verification.
                 </p>
               </div>

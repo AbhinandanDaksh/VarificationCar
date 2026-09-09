@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useId } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FiEye, FiEyeOff, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 
 /**
@@ -55,10 +56,10 @@ const Input = ({
 
   // Border color based on state
   const borderClass = error
-    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+    ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20'
     : success
-    ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500'
-    : 'border-slate-200 focus:border-indigo-600 focus:ring-indigo-600';
+    ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/20'
+    : 'border-[#EDE0DA] focus:border-[#965A48] focus:ring-[#965A48]/20';
 
   // Padding adjustments based on icons
   const paddingLeft = leftIcon ? 'pl-11' : 'pl-4';
@@ -72,10 +73,10 @@ const Input = ({
           {label && (
             <label
               htmlFor={inputId}
-              className="block text-xs font-semibold text-slate-700 tracking-wide uppercase"
+              className="block text-xs font-semibold text-[#5A4540] tracking-wide uppercase"
             >
               {label}
-              {required && <span className="text-red-500 ml-0.5">*</span>}
+              {required && <span className="text-rose-500 ml-0.5">*</span>}
             </label>
           )}
           {labelRight && <span className="text-xs">{labelRight}</span>}
@@ -86,7 +87,7 @@ const Input = ({
       <div className="relative flex items-center">
         {/* Left Icon */}
         {leftIcon && (
-          <span className="absolute left-3.5 text-slate-400 pointer-events-none flex items-center">
+          <span className="absolute left-3.5 text-[#9E8781] pointer-events-none flex items-center">
             {leftIcon}
           </span>
         )}
@@ -106,13 +107,13 @@ const Input = ({
             error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
           }
           className={[
-            'w-full py-3 text-sm rounded-lg bg-white border',
+            'w-full py-3 text-sm rounded-xl bg-white border',
             borderClass,
             paddingLeft,
             paddingRight,
-            'text-slate-900 placeholder-slate-400 outline-none transition-colors duration-200 shadow-sm',
-            'focus:ring-1',
-            disabled ? 'opacity-50 cursor-not-allowed bg-slate-50' : '',
+            'text-[#2E1F1A] placeholder-[#B5A19B] outline-none transition-all duration-200 shadow-xs',
+            'focus:ring-2',
+            disabled ? 'opacity-50 cursor-not-allowed bg-stone-50' : '',
             inputClassName,
           ]
             .filter(Boolean)
@@ -127,7 +128,7 @@ const Input = ({
               type="button"
               tabIndex={-1}
               onClick={() => setShowPassword((p) => !p)}
-              className="text-slate-400 hover:text-slate-600 focus:outline-none transition p-0.5 cursor-pointer"
+              className="text-[#9E8781] hover:text-[#5A4540] focus:outline-none transition p-0.5 cursor-pointer"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? (
@@ -138,30 +139,73 @@ const Input = ({
             </button>
           )}
 
-          {!isPassword && error && (
-            <FiAlertCircle className="w-4.5 h-4.5 text-red-500 shrink-0" />
-          )}
-          {!isPassword && success && !error && (
-            <FiCheckCircle className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
-          )}
+          <AnimatePresence mode="wait">
+            {!isPassword && error && (
+              <motion.span
+                key="error-icon"
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.15 }}
+              >
+                <FiAlertCircle className="w-4.5 h-4.5 text-rose-500 shrink-0" />
+              </motion.span>
+            )}
+            {!isPassword && success && !error && (
+              <motion.span
+                key="success-icon"
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.15 }}
+              >
+                <FiCheckCircle className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+              </motion.span>
+            )}
+          </AnimatePresence>
           {rightElement && <span>{rightElement}</span>}
         </span>
       </div>
 
-      {/* Below input: error > success > hint */}
-      {error && (
-        <p id={`${inputId}-error`} className="mt-1.5 text-xs text-red-500 font-medium">
-          {error}
-        </p>
-      )}
-      {!error && success && (
-        <p className="mt-1.5 text-xs text-emerald-600 font-medium">{success}</p>
-      )}
-      {!error && !success && hint && (
-        <p id={`${inputId}-hint`} className="mt-1.5 text-xs text-slate-400 font-medium">
-          {hint}
-        </p>
-      )}
+      {/* Smooth animated error > success > hint below input */}
+      <AnimatePresence mode="wait">
+        {error ? (
+          <motion.p
+            key="input-error"
+            id={`${inputId}-error`}
+            initial={{ opacity: 0, y: -4, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -4, height: 0 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-1.5 text-xs text-rose-500 font-medium overflow-hidden"
+          >
+            {error}
+          </motion.p>
+        ) : success ? (
+          <motion.p
+            key="input-success"
+            initial={{ opacity: 0, y: -4, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -4, height: 0 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-1.5 text-xs text-emerald-600 font-medium overflow-hidden"
+          >
+            {success}
+          </motion.p>
+        ) : hint ? (
+          <motion.p
+            key="input-hint"
+            id={`${inputId}-hint`}
+            initial={{ opacity: 0, y: -4, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -4, height: 0 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-1.5 text-xs text-[#9E8781] font-medium overflow-hidden"
+          >
+            {hint}
+          </motion.p>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 };

@@ -74,132 +74,147 @@ const RegisterForm = () => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="w-full max-w-[500px] bg-white rounded-2xl border border-slate-100 shadow-sm p-8 sm:p-10 transition-shadow duration-300 hover:shadow-md"
+      transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+      className="relative w-full max-w-[500px]"
     >
-      <div className="mb-8">
-        <h2 className="text-[28px] font-bold tracking-tight text-slate-900 leading-tight">
-          Create your account
-        </h2>
-        <p className="mt-2 text-sm text-slate-500 font-medium">
-          Join the most trusted vehicle verification network.
-        </p>
-      </div>
+      {/* Light Pink & Warm Mocha Ambient Glow */}
+      <div className="absolute -inset-1.5 bg-gradient-to-tr from-[#F7D4CC]/70 via-[#F8E8E2]/50 to-[#DEC6BC]/60 rounded-[32px] blur-2xl opacity-90 pointer-events-none" />
 
-      <AnimatePresence mode="wait">
-        {errors.submit && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-r-md overflow-hidden"
-          >
-            {errors.submit}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Full Name */}
-        <Input
-          label="Full Name"
-          id="fullName"
-          name="fullName"
-          type="text"
-          value={formData.fullName}
-          onChange={handleChange}
-          placeholder="John Doe"
-          leftIcon={<FiUser className="w-5 h-5" />}
-          error={errors.fullName}
-        />
-
-        {/* Email Address */}
-        <Input
-          label="Email Address"
-          id="email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="name@company.com"
-          leftIcon={<FiMail className="w-5 h-5" />}
-          error={errors.email}
-        />
-
-        {/* Passwords (Grid layout for Desktop, Stacked on Mobile) */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {/* Password */}
-          <Input
-            label="Password"
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            leftIcon={<FiLock className="w-5 h-5" />}
-            error={errors.password}
-          />
-
-          {/* Confirm Password */}
-          <Input
-            label="Confirm Password"
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder="••••••••"
-            leftIcon={<FiShield className="w-5 h-5" />}
-            error={errors.confirmPassword}
-          />
+      <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl border border-[#EDE0DA] shadow-[0_12px_45px_-8px_rgba(110,65,50,0.1)] p-8 sm:p-10 transition-all duration-300 hover:shadow-[0_18px_55px_-8px_rgba(110,65,50,0.14)]">
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF0ED] border border-[#F3DDD5] text-[#8A5343] text-xs font-semibold tracking-wide uppercase mb-3.5 shadow-xs">
+            <FiShield className="w-3.5 h-3.5 text-[#965A48]" />
+            <span>Join Network</span>
+          </div>
+          <h2 className="text-2xl sm:text-[28px] font-bold tracking-tight text-[#2E1F1A] leading-tight">
+            Create your account
+          </h2>
+          <p className="mt-2 text-sm text-[#7C6660] font-medium">
+            Join the most trusted vehicle verification network.
+          </p>
         </div>
 
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          fullWidth
-          size="lg"
-          isLoading={isLoading}
-          loadingText="Creating Account..."
-          className="mt-2"
-        >
-          Create Account
-        </Button>
-      </form>
+        <AnimatePresence mode="wait">
+          {errors.submit && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6 p-3.5 bg-[#FDF2F0] border border-[#F5C7BF] text-[#A63C2E] text-xs sm:text-sm font-medium rounded-xl overflow-hidden shadow-xs"
+            >
+              {errors.submit}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Login link */}
-      <div className="mt-6 text-center text-sm font-medium">
-        <span className="text-slate-500">Already have an account? </span>
-        <Link href="/auth/login" className="text-indigo-600 hover:text-indigo-500 hover:underline transition">
-          Login
-        </Link>
-      </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Full Name */}
+          <Input
+            label="Full Name"
+            id="fullName"
+            name="fullName"
+            type="text"
+            value={formData.fullName}
+            onChange={handleChange}
+            placeholder="John Doe"
+            leftIcon={<FiUser className="w-4.5 h-4.5 text-[#9E8781]" />}
+            error={errors.fullName}
+            inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
+          />
 
-      {/* Enterprise Single Sign-On Section */}
-      <div className="mt-8 pt-8 border-t border-slate-100">
-        <p className="text-[11px] font-bold text-slate-400 tracking-wider text-center uppercase mb-4">
-          Enterprise Single Sign-On
-        </p>
-        <div className="grid grid-cols-2 gap-4">
+          {/* Email Address */}
+          <Input
+            label="Email Address"
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="name@company.com"
+            leftIcon={<FiMail className="w-4.5 h-4.5 text-[#9E8781]" />}
+            error={errors.email}
+            inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
+          />
+
+          {/* Passwords (Grid layout for Desktop, Stacked on Mobile) */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {/* Password */}
+            <Input
+              label="Password"
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              leftIcon={<FiLock className="w-4.5 h-4.5 text-[#9E8781]" />}
+              error={errors.password}
+              inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
+            />
+
+            {/* Confirm Password */}
+            <Input
+              label="Confirm Password"
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="••••••••"
+              leftIcon={<FiShield className="w-4.5 h-4.5 text-[#9E8781]" />}
+              error={errors.confirmPassword}
+              inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
+            />
+          </div>
+
+          {/* Submit Button */}
           <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<SiOkta className="w-5 h-5 text-slate-800" />}
-            onClick={() => alert('SSO login via Okta initiated.')}
+            type="submit"
+            fullWidth
+            size="lg"
+            isLoading={isLoading}
+            loadingText="Creating Account..."
+            className="mt-2 bg-gradient-to-r from-[#965A48] via-[#854B3A] to-[#6E3C2D] hover:from-[#854B3A] hover:to-[#5A2E21] text-white shadow-md shadow-[#854B3A]/25 active:scale-[0.99] transition-all duration-200 cursor-pointer"
           >
-            Okta
+            Create Account
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<TbBrandAzure className="w-5 h-5 text-sky-500" />}
-            onClick={() => alert('SSO login via Azure AD initiated.')}
-          >
-            Azure AD
-          </Button>
+        </form>
+
+        {/* Login link */}
+        <div className="mt-6 text-center text-sm font-medium">
+          <span className="text-[#87726C]">Already have an account? </span>
+          <Link href="/auth/login" className="font-semibold text-[#965A48] hover:text-[#783F30] hover:underline transition-colors">
+            Login
+          </Link>
+        </div>
+
+        {/* Enterprise Single Sign-On Section */}
+        <div className="mt-8 pt-6 border-t border-[#EDE0DA]">
+          <div className="relative flex justify-center text-xs uppercase mb-5">
+            <span className="bg-white px-3 text-[11px] font-bold tracking-wider text-[#A38E88]">
+              Enterprise Single Sign-On
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => alert('SSO login via Okta initiated.')}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#EBDCD6] bg-[#FCFAF9] hover:bg-[#F8EFEB] active:bg-[#F2E5E0] text-[#4A352F] text-xs font-semibold shadow-xs transition-all hover:border-[#DEC5BC] cursor-pointer"
+            >
+              <SiOkta className="w-4 h-4 text-[#2E1F1A]" />
+              <span>Okta</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => alert('SSO login via Azure AD initiated.')}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#EBDCD6] bg-[#FCFAF9] hover:bg-[#F8EFEB] active:bg-[#F2E5E0] text-[#4A352F] text-xs font-semibold shadow-xs transition-all hover:border-[#DEC5BC] cursor-pointer"
+            >
+              <TbBrandAzure className="w-4.5 h-4.5 text-[#0078D4]" />
+              <span>Azure AD</span>
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>
