@@ -1,7 +1,8 @@
-require('dotenv').config({ path: '../../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const express = require('express');
 const cors = require('cors');
-const { sequelize, connectDB } = require('../../shared/config/db');
+const { connectDB } = require('../../shared/config/db');
 const authRoutes = require('./src/routes/authRoutes');
 require('./src/models/User');
 require('./src/models/RefreshToken');
@@ -12,8 +13,6 @@ app.use(express.json());
 
 const start = async () => {
   await connectDB();
-  await sequelize.sync({ alter: true });
-  console.log('✅ Tables synced');
 };
 start();
 

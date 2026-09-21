@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { Op } = require('sequelize');
 const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
 const {
@@ -29,7 +28,7 @@ const issueTokens = async (user) => {
   const refreshToken = generateRefreshToken(user);
 
   await RefreshToken.create({
-    userId: user.id,
+    userId: user._id || user.id,
     tokenHash: hashToken(refreshToken),
     expiresAt: new Date(Date.now() + refreshExpiryMs()),
   });
@@ -38,14 +37,14 @@ const issueTokens = async (user) => {
 };
 
 const revokeAllRefreshTokens = async (userId) => {
-  await RefreshToken.update(
-    { revokedAt: new Date() },
-    { where: { userId, revokedAt: null } }
+  await RefreshToken.updateMany(
+    { userId, revokedAt: null },
+    { $set: { revokedAt: new Date() } }
   );
 };
 
 const publicUser = (user) => ({
-  id: user.id,
+  id: user._id?.toString() || user.id,
   name: user.name,
   email: user.email,
   role: user.role,
@@ -67,15 +66,16 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'name, email and password are required' });
     }
 
-    const existing = await User.findOne({ where: { email } });
+    const normalizedEmail = email.trim().toLowerCase();
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) return res.status(400).json({ message: 'User already exists' });
 
     const verifyToken = createRawToken();
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
       emailVerifyToken: hashToken(verifyToken),
       emailVerifyExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -106,7 +106,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'email and password are required' });
     }
 
-    const user = await User.findOne({ where: { email } });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -138,7 +139,8 @@ exports.refresh = async (req, res) => {
     }
 
     const stored = await RefreshToken.findOne({
-      where: { tokenHash: hashToken(refreshToken), userId: decoded.id },
+      tokenHash: hashToken(refreshToken),
+      userId: decoded.id,
     });
 
     if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
@@ -148,7 +150,7 @@ exports.refresh = async (req, res) => {
     stored.revokedAt = new Date();
     await stored.save();
 
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findById(decoded.id);
     if (!user) return res.status(401).json({ message: 'User not found' });
 
     const tokens = await issueTokens(user);
@@ -166,7 +168,7 @@ exports.logout = async (req, res) => {
     }
 
     const stored = await RefreshToken.findOne({
-      where: { tokenHash: hashToken(refreshToken) },
+      tokenHash: hashToken(refreshToken),
     });
 
     if (stored && !stored.revokedAt) {
@@ -182,11 +184,9 @@ exports.logout = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'name', 'email', 'role', 'isEmailVerified', 'createdAt'],
-    });
+    const user = await User.findById(req.user.id).select('name email role isEmailVerified createdAt');
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ user });
+    res.json({ user: publicUser(user) });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -202,7 +202,7 @@ exports.changePassword = async (req, res) => {
       return res.status(400).json({ message: 'newPassword must be at least 6 characters' });
     }
 
-    const user = await User.findByPk(req.user.id);
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -210,7 +210,7 @@ exports.changePassword = async (req, res) => {
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
-    await revokeAllRefreshTokens(user.id);
+    await revokeAllRefreshTokens(user._id || user.id);
 
     res.json({ message: 'Password changed successfully. Please login again.' });
   } catch (err) {
@@ -223,7 +223,8 @@ exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'email is required' });
 
-    const user = await User.findOne({ where: { email } });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
 
     // same response whether user exists or not
     if (user) {
@@ -253,10 +254,8 @@ exports.resetPassword = async (req, res) => {
     }
 
     const user = await User.findOne({
-      where: {
-        resetPasswordToken: hashToken(token),
-        resetPasswordExpires: { [Op.gt]: new Date() },
-      },
+      resetPasswordToken: hashToken(token),
+      resetPasswordExpires: { $gt: new Date() },
     });
 
     if (!user) return res.status(400).json({ message: 'Invalid or expired reset token' });
@@ -265,7 +264,7 @@ exports.resetPassword = async (req, res) => {
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     await user.save();
-    await revokeAllRefreshTokens(user.id);
+    await revokeAllRefreshTokens(user._id || user.id);
 
     res.json({ message: 'Password reset successful. Please login.' });
   } catch (err) {
@@ -279,10 +278,8 @@ exports.verifyEmail = async (req, res) => {
     if (!token) return res.status(400).json({ message: 'token is required' });
 
     const user = await User.findOne({
-      where: {
-        emailVerifyToken: hashToken(token),
-        emailVerifyExpires: { [Op.gt]: new Date() },
-      },
+      emailVerifyToken: hashToken(token),
+      emailVerifyExpires: { $gt: new Date() },
     });
 
     if (!user) return res.status(400).json({ message: 'Invalid or expired verify token' });

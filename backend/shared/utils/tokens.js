@@ -8,14 +8,14 @@ const REFRESH_EXPIRES = () => process.env.JWT_REFRESH_EXPIRES || '7d';
 
 const generateAccessToken = (user) =>
   jwt.sign(
-    { id: user.id, role: user.role, type: 'access' },
+    { id: user.id || user._id, role: user.role, type: 'access' },
     ACCESS_SECRET(),
     { expiresIn: ACCESS_EXPIRES() }
   );
 
 const generateRefreshToken = (user) =>
   jwt.sign(
-    { id: user.id, role: user.role, type: 'refresh' },
+    { id: user.id || user._id, role: user.role, type: 'refresh' },
     REFRESH_SECRET(),
     { expiresIn: REFRESH_EXPIRES() }
   );
