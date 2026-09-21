@@ -188,7 +188,7 @@ const LoginForm = () => {
         </div>
 
         {/* Enterprise Single Sign-On Section */}
-        <div className="mt-8 pt-6 border-t border-[#EDE0DA]">
+        {/* <div className="mt-8 pt-6 border-t border-[#EDE0DA]">
           <div className="relative flex justify-center text-xs uppercase mb-5">
             <span className="bg-white px-3 text-[11px] font-bold tracking-wider text-[#A38E88]">
               Enterprise Single Sign-On
@@ -213,7 +213,7 @@ const LoginForm = () => {
               <span>Azure AD</span>
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
     </motion.div>
   );
