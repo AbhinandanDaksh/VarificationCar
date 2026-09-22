@@ -8,7 +8,10 @@ require('./src/models/User');
 require('./src/models/RefreshToken');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:8080'],
+  credentials: true,
+}));
 app.use(express.json());
 
 const start = async () => {
@@ -17,6 +20,7 @@ const start = async () => {
 start();
 
 app.use('/api/auth', authRoutes);
+app.use('/', authRoutes);
 
 const PORT = process.env.AUTH_PORT || 5001;
 app.listen(PORT, () => console.log(`🚀 Auth service running on port ${PORT}`));

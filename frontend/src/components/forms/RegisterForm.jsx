@@ -1,15 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiUser, FiMail, FiLock, FiShield } from 'react-icons/fi';
-import { SiOkta } from 'react-icons/si';
-import { TbBrandAzure } from 'react-icons/tb';
+import { FiUser, FiMail, FiLock, FiShield, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import { registerUser, clearError, clearSuccess } from '@/store/auth';
 
 const RegisterForm = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { loading, error, registerSuccess, successMessage } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -17,14 +22,21 @@ const RegisterForm = () => {
     confirmPassword: '',
   });
 
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    dispatch(clearError());
+    dispatch(clearSuccess());
+  }, [dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+    if (error) {
+      dispatch(clearError());
     }
   };
 
@@ -54,22 +66,15 @@ const RegisterForm = () => {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      setFormErrors(newErrors);
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Simulated signup request
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      alert('Registration successful! Welcome to VeriDrive.');
-      setFormData({ fullName: '', email: '', password: '', confirmPassword: '' });
-    } catch (err) {
-      console.error(err);
-      setErrors({ submit: 'Something went wrong. Please try again.' });
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(registerUser({
+      name: formData.fullName,
+      email: formData.email,
+      password: formData.password,
+    }));
   };
 
   return (
@@ -96,15 +101,32 @@ const RegisterForm = () => {
           </p>
         </div>
 
+        {/* Global Error Banner */}
         <AnimatePresence mode="wait">
-          {errors.submit && (
+          {error && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-6 p-3.5 bg-[#FDF2F0] border border-[#F5C7BF] text-[#A63C2E] text-xs sm:text-sm font-medium rounded-xl overflow-hidden shadow-xs"
+              className="mb-6 p-3.5 bg-[#FDF2F0] border border-[#F5C7BF] text-[#A63C2E] text-xs sm:text-sm font-medium rounded-xl flex items-center gap-2.5 overflow-hidden shadow-xs"
             >
-              {errors.submit}
+              <FiAlertCircle className="w-4 h-4 text-[#A63C2E] shrink-0" />
+              <span>{error}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Global Success Banner */}
+        <AnimatePresence mode="wait">
+          {registerSuccess && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6 p-3.5 bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] text-xs sm:text-sm font-medium rounded-xl flex items-center gap-2.5 overflow-hidden shadow-xs"
+            >
+              <FiCheckCircle className="w-4 h-4 text-[#166534] shrink-0" />
+              <span>{successMessage || 'Account created successfully! Please verify your email.'}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -120,7 +142,7 @@ const RegisterForm = () => {
             onChange={handleChange}
             placeholder="John Doe"
             leftIcon={<FiUser className="w-4.5 h-4.5 text-[#9E8781]" />}
-            error={errors.fullName}
+            error={formErrors.fullName}
             inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
           />
 
@@ -134,7 +156,7 @@ const RegisterForm = () => {
             onChange={handleChange}
             placeholder="name@company.com"
             leftIcon={<FiMail className="w-4.5 h-4.5 text-[#9E8781]" />}
-            error={errors.email}
+            error={formErrors.email}
             inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
           />
 
@@ -150,7 +172,7 @@ const RegisterForm = () => {
               onChange={handleChange}
               placeholder="••••••••"
               leftIcon={<FiLock className="w-4.5 h-4.5 text-[#9E8781]" />}
-              error={errors.password}
+              error={formErrors.password}
               inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
             />
 
@@ -164,7 +186,7 @@ const RegisterForm = () => {
               onChange={handleChange}
               placeholder="••••••••"
               leftIcon={<FiShield className="w-4.5 h-4.5 text-[#9E8781]" />}
-              error={errors.confirmPassword}
+              error={formErrors.confirmPassword}
               inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
             />
           </div>
@@ -174,7 +196,7 @@ const RegisterForm = () => {
             type="submit"
             fullWidth
             size="lg"
-            isLoading={isLoading}
+            isLoading={loading}
             loadingText="Creating Account..."
             className="mt-2 bg-gradient-to-r from-[#965A48] via-[#854B3A] to-[#6E3C2D] hover:from-[#854B3A] hover:to-[#5A2E21] text-white shadow-md shadow-[#854B3A]/25 active:scale-[0.99] transition-all duration-200 cursor-pointer"
           >

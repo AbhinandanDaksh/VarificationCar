@@ -1,23 +1,37 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMail, FiLock, FiArrowRight, FiShield, FiAlertCircle } from 'react-icons/fi';
-import { SiOkta } from 'react-icons/si';
-import { TbBrandAzure } from 'react-icons/tb';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import { loginUser, clearError } from '@/store/auth';
 
 const LoginForm = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false,
   });
 
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,8 +39,11 @@ const LoginForm = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+    if (error) {
+      dispatch(clearError());
     }
   };
 
@@ -48,22 +65,11 @@ const LoginForm = () => {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      setFormErrors(newErrors);
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Simulated sign in request
-      await new Promise((resolve) => setTimeout(resolve, 1400));
-      alert('Login successful! Welcome to VeriDrive.');
-      setFormData({ email: '', password: '', rememberMe: false });
-    } catch (err) {
-      console.error(err);
-      setErrors({ submit: 'Invalid credentials. Please verify and try again.' });
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(loginUser({ email: formData.email, password: formData.password }));
   };
 
   return (
@@ -95,7 +101,7 @@ const LoginForm = () => {
 
         {/* Global Error Banner */}
         <AnimatePresence mode="wait">
-          {errors.submit && (
+          {error && (
             <motion.div
               initial={{ opacity: 0, height: 0, y: -6 }}
               animate={{ opacity: 1, height: 'auto', y: 0 }}
@@ -103,7 +109,7 @@ const LoginForm = () => {
               className="mb-6 p-3.5 bg-[#FDF2F0] border border-[#F5C7BF] text-[#A63C2E] text-xs sm:text-sm font-medium rounded-xl flex items-center gap-2.5 overflow-hidden shadow-xs"
             >
               <FiAlertCircle className="w-4 h-4 text-[#A63C2E] shrink-0" />
-              <span>{errors.submit}</span>
+              <span>{error}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -119,7 +125,7 @@ const LoginForm = () => {
             onChange={handleChange}
             placeholder="name@dealership.com"
             leftIcon={<FiMail className="w-4.5 h-4.5 text-[#9E8781]" />}
-            error={errors.email}
+            error={formErrors.email}
             inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
           />
 
@@ -133,7 +139,7 @@ const LoginForm = () => {
             onChange={handleChange}
             placeholder="••••••••••••"
             leftIcon={<FiLock className="w-4.5 h-4.5 text-[#9E8781]" />}
-            error={errors.password}
+            error={formErrors.password}
             inputClassName="border-[#E5D7D1] text-[#2E1F1A] placeholder-[#B5A19B] focus:border-[#965A48] focus:ring-[#965A48]/20"
             labelRight={
               <Link
@@ -167,9 +173,9 @@ const LoginForm = () => {
             type="submit"
             fullWidth
             size="lg"
-            isLoading={isLoading}
+            isLoading={loading}
             loadingText="Signing In..."
-            rightIcon={!isLoading && <FiArrowRight className="w-4 h-4" />}
+            rightIcon={!loading && <FiArrowRight className="w-4 h-4" />}
             className="mt-2 bg-gradient-to-r from-[#965A48] via-[#854B3A] to-[#6E3C2D] hover:from-[#854B3A] hover:to-[#5A2E21] text-white shadow-md shadow-[#854B3A]/25 active:scale-[0.99] transition-all duration-200 cursor-pointer"
           >
             Sign In
